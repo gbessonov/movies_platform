@@ -1,0 +1,101 @@
+openapi: 3.0.3
+info:
+  title: Movies Service API
+  description: API for managing movies and their ratings.
+  version: 1.0.0
+
+servers:
+  - url: "http://{server}/api"
+    variables:
+      server:
+        default: localhost:8765
+
+paths:
+    /api/movies:
+        get:
+            summary: List movies
+            operationId: getMovies
+            responses:
+              '200':
+                description: OK
+                content:
+                  application/json:
+                    schema: { $ref: '#/components/schemas/Movies' }
+    /api/movies/{id}:
+        get:
+            summary: Get movie by identifier
+            operationId: getMovieById
+            parameters:
+              - name: id
+                in: path
+                required: true
+                description: Identifier for the movie
+                schema:
+                  type: string
+                  pattern: '^[a-zA-Z0-9\-_]+$'
+                  minLength: 1
+                  maxLength: 100
+                example: "e7f9bf39-286d-4c5b-8ef4-c0e7a5a8232f"
+            responses:
+              '200':
+                description: OK
+                content:
+                  application/json:
+                    schema: { $ref: '#/components/schemas/Movie' }
+              '400':
+                $ref: '#/components/responses/BadRequest'
+              '404':
+                $ref: '#/components/responses/NotFound'
+
+components:
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    Movie:
+        type: object
+        properties:
+            id:
+                type: string
+                format: uuid
+                description: Unique identifier for the movie
+            title:
+                type: string
+                description: Title of the movie
+        required:
+            - id
+            - title
+    Movies:
+        type: array
+        items:
+            $ref: '#/components/schemas/Movie'
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type
+          example: "NOT_FOUND"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Resource with name 'some-name' not found"
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp
+          example: "2024-01-15T10:30:00Z"

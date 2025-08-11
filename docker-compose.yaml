@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: movies_db
+    environment:
+      POSTGRES_USER: movies_user
+      POSTGRES_PASSWORD: iddqd
+      POSTGRES_DB: movies
+    ports:
+      - "5432:5432"

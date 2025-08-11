@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/movies
+    username: movies_user
+    password: iddqd
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    url: jdbc:postgresql://localhost:5432/movies
+    user: movies_user
+    password: iddqd
+    locations: classpath:db/migration,classpath:db/migration/dev
