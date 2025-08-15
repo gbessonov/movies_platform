@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5431/users
+    username: users_user
+    password: idkfa
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    url: jdbc:postgresql://localhost:5431/users
+    user: users_user
+    password: idkfa
+    locations: classpath:db/migration,classpath:db/migration/dev

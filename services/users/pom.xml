@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>io.github.gbessonov.movies_platform</groupId>
-    <artifactId>movies-service</artifactId>
+    <artifactId>users-service</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>movies</name>
-    <description>movies</description>
+    <name>users</name>
+    <description>users</description>
 
     <profiles>
         <profile>
@@ -72,7 +72,6 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-
         </dependency>
 
         <dependency>

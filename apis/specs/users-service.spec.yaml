@@ -1,0 +1,46 @@
+openapi: 3.0.3
+info:
+  title: Users Service API
+  description: API for managing users and authz.
+  version: 1.0.0
+
+servers:
+  - url: "http://{server}"
+    variables:
+      server:
+        default: localhost:8764
+
+paths:
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: List users
+      operationId: getUsers
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the user
+        name:
+          type: string
+          description: User name
+      required:
+        - id
+        - name
+    Users:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'

@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  db:
+  movies_db:
     image: postgres:16
     container_name: movies_db
     environment:
@@ -10,3 +10,12 @@ services:
       POSTGRES_DB: movies
     ports:
       - "5432:5432"
+  users_db:
+    image: postgres:16
+    container_name: users_db
+    environment:
+      POSTGRES_USER: users_user
+      POSTGRES_PASSWORD: idkfa
+      POSTGRES_DB: users
+    ports:
+      - "5431:5432"

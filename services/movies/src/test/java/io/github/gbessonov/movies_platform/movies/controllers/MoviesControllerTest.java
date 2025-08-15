@@ -20,14 +20,18 @@ public class MoviesControllerTest {
     }
 
     @Test
-    public void testSayHello() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/api/movies/123", String.class);
+    public void testInvalidId() {
+        var TEST_ID = "12345678-some-uuid-goes-here~4174000";
+        ResponseEntity<String> response = restTemplate.getForEntity("/api/movies/" + TEST_ID, String.class);
 
         // Assert the HTTP status
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 
         // Assert the response body contains expected error information
         String responseBody = response.getBody();
-        Assertions.assertNull(responseBody);
+        Assertions.assertNotNull(responseBody);
+        Assertions.assertTrue(responseBody.contains("Movie with id '" + TEST_ID + "' not found"));
+        Assertions.assertTrue(responseBody.contains("Not Found"));
+        Assertions.assertTrue(responseBody.contains("timestamp"));
     }
 }

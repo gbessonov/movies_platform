@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MoviesRepository {
-    List<DbMovie> getMovies();
-    Optional<DbMovie> getMovie(UUID id);
+    List<DbMovie> get();
+    Optional<DbMovie> get(UUID id);
+    DbMovie save(DbMovie movie);
+    void deleteById(UUID id);
+    boolean existsById(UUID id);
 }
