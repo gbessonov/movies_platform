@@ -12,3 +12,9 @@ spring:
     user: users_user
     password: idkfa
     locations: classpath:db/migration,classpath:db/migration/dev
+jwt:
+  key: 5b4e11d4-b718-4477-a61d-b3e7e83f3fe8
+  issuer: movies_platform
+  audience: movies_platform
+  expiration:
+    seconds: 3600

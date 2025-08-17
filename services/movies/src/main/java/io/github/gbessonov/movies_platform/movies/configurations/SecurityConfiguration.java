@@ -18,12 +18,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll() //TODO: decide if we want to secure actuator endpoints
                         .requestMatchers("/api/movies").permitAll()
-                        .requestMatchers("/api/movies/**").permitAll()
-                        //TODO: ENABLE AUTHORIZATION
-//                        .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/api/movies/**").hasAnyAuthority("SCOPE_movies:write", "ROLE_ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasAnyAuthority("SCOPE_movies:write", "ROLE_ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasAnyAuthority("SCOPE_movies:write", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/movies/**").hasAnyAuthority("SCOPE_movies:write", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasAnyAuthority("SCOPE_movies:write", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/movies/**").hasAnyAuthority("SCOPE_movies:write", "ROLE_ADMIN")
                         .anyRequest().authenticated()
                 );
 

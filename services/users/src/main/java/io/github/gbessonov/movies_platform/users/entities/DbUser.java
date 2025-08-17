@@ -19,10 +19,7 @@ public class DbUser {
     public String name;
 
     @Column(nullable = false)
-    public String passwordHash;
-
-    @Column(nullable = false)
-    public String salt;
+    public String password;
 
     @CreationTimestamp
     public Timestamp createdAt;
