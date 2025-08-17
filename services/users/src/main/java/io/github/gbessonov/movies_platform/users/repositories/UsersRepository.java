@@ -7,6 +7,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UsersRepository {
-    List<DbUser> getMovies();
-    Optional<DbUser> getMovie(UUID id);
+    List<DbUser> getUsers();
+    Optional<DbUser> getUserById(UUID id);
+    Optional<DbUser> getUserByName(String name);
+    DbUser save(DbUser user);
+    void deleteUser(UUID id);
+    boolean existsByName(String name);
 }

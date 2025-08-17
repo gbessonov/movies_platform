@@ -43,7 +43,15 @@ This will start the PostgreSQL database for local development.
 
 Run flyway migrations:
 ```bash
-  mvn clean flyway:migrate
+  mvn clean flyway:migrate \
+    -Dflyway.url=jdbc:postgresql://localhost:5432/movies \
+    -Dflyway.user=movies_user \
+    -Dflyway.password=iddqd
+
+  mvn clean flyway:migrate \
+    -Dflyway.url=jdbc:postgresql://localhost:5431/users \
+    -Dflyway.user=users_user \
+    -Dflyway.password=idkfa
 ```
 
 

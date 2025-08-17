@@ -108,6 +108,7 @@
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <version>7.6.0</version>
                 <executions>
+                    <!-- Movies -->
                     <execution>
                         <id>generate-movies-api</id>
                         <phase>generate-sources</phase>
@@ -131,6 +132,7 @@
                             </configOptions>
                         </configuration>
                     </execution>
+                    <!-- Users -->
                     <execution>
                         <id>generate-users-api</id>
                         <phase>generate-sources</phase>
@@ -143,6 +145,30 @@
                             <output>${project.build.directory}/generated-users</output>
                             <apiPackage>io.github.gbessonov.movies_platform.users.api</apiPackage>
                             <modelPackage>io.github.gbessonov.movies_platform.users.model</modelPackage>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <useJakarta>true</useJakarta>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <unhandledException>true</unhandledException>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <!-- Authz -->
+                    <execution>
+                        <id>generate-auth-api</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/specs/authz.spec.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.build.directory}/generated-authz</output>
+                            <apiPackage>io.github.gbessonov.movies_platform.authz.api</apiPackage>
+                            <modelPackage>io.github.gbessonov.movies_platform.authz.model</modelPackage>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <configOptions>
@@ -173,13 +199,13 @@
                             <sources>
                                 <source>${project.build.directory}/generated-movies/src/main/java</source>
                                 <source>${project.build.directory}/generated-users/src/main/java</source>
+                                <source>${project.build.directory}/generated-authz/src/main/java</source>
                             </sources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- Package the raw spec so services can serve it at /openapi/orders.yaml -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>

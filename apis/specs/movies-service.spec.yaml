@@ -74,13 +74,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MovieResponse'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MovieResponse'
+                $ref: '#/components/schemas/ErrorResponse'
     patch:
       tags:
         - Movies

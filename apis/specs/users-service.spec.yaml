@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Users Service API
-  description: API for managing users and authz.
+  description: API for managing users.
   version: 1.0.0
 
 servers:
@@ -24,9 +24,107 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Users'
+    post:
+      tags:
+        - Users
+      summary: Add user
+      operationId: addUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+    patch:
+      tags:
+        - Users
+      summary: Update user
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifier of the user to update
+          schema:
+            type: string
+          example: "e7f9bf39-286d-4c5b-8ef4-c0e7a5a8232f"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifier of the user to delete
+          schema:
+            type: string
+          example: "e7f9bf39-286d-4c5b-8ef4-c0e7a5a8232f"
+      responses:
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
+    CreateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the user
+        password:
+          type: string
+          description: Password for the user
+      required:
+        - name
+        - password
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the user
+        password:
+          type: string
+          description: Password for the user
+
+    UsersResponse:
+      oneOf:
+        - $ref: '#/components/schemas/Users'
+        - $ref: '#/components/schemas/ErrorResponse'
+
+    UserResponse:
+      oneOf:
+        - $ref: '#/components/schemas/User'
+        - $ref: '#/components/schemas/ErrorResponse'
+
     User:
       type: object
       properties:
@@ -40,7 +138,28 @@ components:
       required:
         - id
         - name
+
     Users:
       type: array
       items:
         $ref: '#/components/schemas/User'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error type
+          example: "NOT_FOUND"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Resource with name 'some-name' not found"
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp
+          example: "2024-01-15T10:30:00Z"
+      required:
+        - error
+        - message

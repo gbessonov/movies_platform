@@ -2,6 +2,7 @@ package io.github.gbessonov.movies_platform.users.entities;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
@@ -19,6 +20,9 @@ public class DbUser {
 
     @Column(nullable = false)
     public String passwordHash;
+
+    @Column(nullable = false)
+    public String salt;
 
     @CreationTimestamp
     public Timestamp createdAt;

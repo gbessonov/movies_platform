@@ -1,0 +1,151 @@
+openapi: 3.0.3
+info:
+  title: Authentication and Authorization API
+  description: Authentication and Authorization API
+  version: 1.0.0
+
+servers:
+  - url: "http://{server}"
+    variables:
+      server:
+        default: localhost:8764
+
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      operationId: userLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/register:
+    post:
+      tags:
+        - Auth
+      summary: User registration
+      operationId: userRegister
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username of the user
+        password:
+          type: string
+          description: Password of the user
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      oneOf:
+        - $ref: '#/components/schemas/LoginSuccessResponse'
+        - $ref: '#/components/schemas/ErrorResponse'
+
+    LoginSuccessResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token for authenticated user
+      required:
+        - token
+
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username of the user
+        password:
+          type: string
+          description: Password of the user
+      required:
+        - username
+        - password
+
+    RegisterResponse:
+      oneOf:
+        - $ref: '#/components/schemas/RegisterSuccessResponse'
+        - $ref: '#/components/schemas/ErrorResponse'
+
+    RegisterSuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message for registration
+          example: "User registered successfully"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error type
+          example: "NOT_FOUND"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Resource with name 'some-name' not found"
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp
+          example: "2024-01-15T10:30:00Z"
+      required:
+        - error
+        - message
