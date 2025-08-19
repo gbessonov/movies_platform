@@ -6,6 +6,8 @@ import io.github.gbessonov.movies_platform.movies.services.MovieLikesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.OffsetDateTime;
@@ -23,7 +25,9 @@ public class MoveLikesController implements MovieLikesApi {
     @Override
     public ResponseEntity<ErrorResponse> likeMovie(String id){
         try {
-            movieLikesService.likeMovie("38ff5540-1a9e-4021-8be7-8fce368edda2", id);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String userName = auth.getName();
+            movieLikesService.likeMovie(userName, id);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             ErrorResponse errorResponse = new ErrorResponse()
@@ -42,7 +46,9 @@ public class MoveLikesController implements MovieLikesApi {
     @Override
     public ResponseEntity<ErrorResponse> unlikeMovie(String id){
         try {
-            movieLikesService.unlikeMovie("38ff5540-1a9e-4021-8be7-8fce368edda2", id);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String userName = auth.getName();
+            movieLikesService.unlikeMovie(userName, id);
             return ResponseEntity.noContent().build();
         }catch (Exception e){
             return ResponseEntity.badRequest().body(new ErrorResponse()

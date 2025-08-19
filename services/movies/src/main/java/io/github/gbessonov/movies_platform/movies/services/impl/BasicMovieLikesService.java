@@ -22,32 +22,27 @@ public class BasicMovieLikesService implements MovieLikesService {
         this.moviesRepository = moviesRepository;
     }
 
-    public void likeMovie(String userId, String movieId) throws IllegalArgumentException {
-        UUID safeUserId = parseUserId(userId);
+    public void likeMovie(String userName, String movieId) throws IllegalArgumentException {
+        validateUserName(userName);
         UUID safeMovieId = parseMovieId(movieId);
         if (!moviesRepository.existsById(safeMovieId)) {
             throw new IllegalArgumentException("Movie with ID " + movieId + " does not exist");
         }
-        repository.likeMovie(safeUserId, safeMovieId);
+        repository.likeMovie(userName, safeMovieId);
     }
 
-    public void unlikeMovie(String userId, String movieId) {
-        UUID safeUserId = parseUserId(userId);
+    public void unlikeMovie(String userName, String movieId) {
+        validateUserName(userName);
         UUID safeMovieId = parseMovieId(movieId);
         if (!moviesRepository.existsById(safeMovieId)) {
             throw new IllegalArgumentException("Movie with ID " + movieId + " does not exist");
         }
-        repository.unlikeMovie(safeUserId, safeMovieId);
+        repository.unlikeMovie(userName, safeMovieId);
     }
 
-    private UUID parseUserId(String userId) {
-        if (userId == null || userId.isEmpty()) {
-            throw new IllegalArgumentException("User ID cannot be null or empty");
-        }
-        try {
-            return UUID.fromString(userId);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid User ID format", e);
+    private void validateUserName(String userName) {
+        if (userName == null || userName.isEmpty()) {
+            throw new IllegalArgumentException("User Name cannot be null or empty");
         }
     }
 

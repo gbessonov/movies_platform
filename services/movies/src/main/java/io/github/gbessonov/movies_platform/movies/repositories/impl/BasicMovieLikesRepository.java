@@ -13,19 +13,19 @@ public class BasicMovieLikesRepository implements MovieLikesRepository {
     private EntityManager entityManager;
 
     @Override
-    public void likeMovie(UUID userId, UUID movieId) {
+    public void likeMovie(String userName, UUID movieId) {
         entityManager.createNativeQuery(
-                "INSERT INTO movies_likes (user_id, movie_id) VALUES (:userId, :movieId) ON CONFLICT (user_id, movie_id) DO NOTHING")
-                .setParameter("userId", userId)
+                "INSERT INTO movies_likes (user_name, movie_id) VALUES (:userName, :movieId) ON CONFLICT (user_name, movie_id) DO NOTHING")
+                .setParameter("userName", userName)
                 .setParameter("movieId", movieId)
                 .executeUpdate();
     }
 
     @Override
-    public void unlikeMovie(UUID userId, UUID movieId) {
+    public void unlikeMovie(String userId, UUID movieId) {
         entityManager.createNativeQuery(
-                "DELETE FROM movies_likes WHERE user_id = :userId AND movie_id = :movieId")
-                .setParameter("userId", userId)
+                "DELETE FROM movies_likes WHERE user_name = :userName AND movie_id = :movieId")
+                .setParameter("userName", userId)
                 .setParameter("movieId", movieId)
                 .executeUpdate();
     }
