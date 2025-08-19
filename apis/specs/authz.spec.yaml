@@ -101,6 +101,14 @@ components:
         token:
           type: string
           description: JWT token for authenticated user
+        username:
+          type: string
+          description: Username of the authenticated user
+        expiresAt:
+          type: integer
+          format: int64
+          description: Token expiration time in milliseconds since epoch
+          example: 1700000000000
       required:
         - token
 

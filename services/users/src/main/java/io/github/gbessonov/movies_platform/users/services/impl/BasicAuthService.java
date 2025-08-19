@@ -8,6 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
+
 @Service
 public class BasicAuthService implements AuthService {
     private final AuthenticationManager authenticationManager;
@@ -19,15 +21,41 @@ public class BasicAuthService implements AuthService {
         this.jwtTokenService = jwtTokenService;
     }
 
-    //TODO: add username, expires etc
-    public String authenticate(String username, String password) {
+    public AuthResponse authenticate(String username, String password) {
         var token = new UsernamePasswordAuthenticationToken(username, password);
         Authentication authentication = authenticationManager.authenticate(token);
 
         String jwtToken = jwtTokenService.generateToken(authentication);
         Long expiresAt = jwtTokenService.extractExpirationTime(jwtToken);
 
-        //return new AuthResponse(jwtToken, authentication.getName(), expiresAt);
-        return jwtToken;
+        return new AuthResponse(
+                jwtToken,
+                authentication.getName(),
+                expiresAt
+        );
+    }
+
+    public static class AuthResponse implements AuthService.AuthResponse {
+        private final String token;
+        private final String username;
+        private final Long expiresAt;
+
+        public AuthResponse(String token, String username, Long expiresAt) {
+            this.token = token;
+            this.username = username;
+            this.expiresAt = expiresAt;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public Long getExpiresAt() {
+            return expiresAt;
+        }
     }
 }

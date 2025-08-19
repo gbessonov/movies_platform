@@ -25,9 +25,11 @@ public class AuthController implements AuthApi {
     @Override
     public ResponseEntity<LoginResponse> userLogin(LoginRequest loginRequest) {
         try {
-            String token = authService.authenticate(loginRequest.getUsername(), loginRequest.getPassword());
+            AuthService.AuthResponse result = authService.authenticate(loginRequest.getUsername(), loginRequest.getPassword());
             LoginSuccessResponse resp = new LoginSuccessResponse()
-                    .token(token);
+                    .token(result.getToken())
+                    .username(result.getUsername())
+                    .expiresAt(result.getExpiresAt());
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
             var resp = new ErrorResponse()
