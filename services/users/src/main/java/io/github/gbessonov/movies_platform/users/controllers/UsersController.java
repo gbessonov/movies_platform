@@ -3,7 +3,9 @@ package io.github.gbessonov.movies_platform.users.controllers;
 import io.github.gbessonov.movies_platform.users.api.UsersApi;
 import io.github.gbessonov.movies_platform.users.model.*;
 import io.github.gbessonov.movies_platform.users.services.UsersService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,6 +13,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController()
+@RateLimiter(name="usersRateLimiter", fallbackMethod = "fallbackMoviesRateLimiter")
 public class UsersController implements UsersApi {
 
     private final UsersService usersService;
@@ -63,5 +66,15 @@ public class UsersController implements UsersApi {
                     .error("Bad Request")
                     .timestamp(OffsetDateTime.now()));
         }
+    }
+
+    public ResponseEntity<io.github.gbessonov.movies_platform.authz.model.ErrorResponse> fallbackMoviesRateLimiter(String something, Throwable t) {
+        // Used by RateLimiter to handle rate limit exceeded errors
+        // This method will be called when the rate limit is exceeded
+        io.github.gbessonov.movies_platform.authz.model.ErrorResponse errorResponse = new io.github.gbessonov.movies_platform.authz.model.ErrorResponse();
+        errorResponse.setMessage("Rate limit exceeded. Please try again later.");
+        errorResponse.setError("Too Many Requests");
+        errorResponse.setTimestamp(OffsetDateTime.now());
+        return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
     }
 }

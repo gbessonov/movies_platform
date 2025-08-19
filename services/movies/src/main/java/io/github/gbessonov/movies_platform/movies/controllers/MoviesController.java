@@ -3,6 +3,7 @@ package io.github.gbessonov.movies_platform.movies.controllers;
 import io.github.gbessonov.movies_platform.movies.api.MoviesApi;
 import io.github.gbessonov.movies_platform.movies.model.*;
 import io.github.gbessonov.movies_platform.movies.services.MoviesService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController()
+@RateLimiter(name="moviesRateLimiter", fallbackMethod = "fallbackMoviesRateLimiter")
 public class MoviesController implements MoviesApi {
 
     private final MoviesService moviesService;
@@ -91,5 +93,15 @@ public class MoviesController implements MoviesApi {
             errorResponse.setTimestamp(OffsetDateTime.now());
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public ResponseEntity<ErrorResponse> fallbackMoviesRateLimiter(String something, Throwable t) {
+        // Used by RateLimiter to handle rate limit exceeded errors
+        // This method will be called when the rate limit is exceeded
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage("Rate limit exceeded. Please try again later.");
+        errorResponse.setError("Too Many Requests");
+        errorResponse.setTimestamp(OffsetDateTime.now());
+        return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
     }
 }

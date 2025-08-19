@@ -12,7 +12,7 @@ management:
     endpoints:
         web:
             exposure:
-                include: health,info,prometheus
+                include: health,info,prometheus,ratelimiters
     endpoint:
         health:
             probes:
@@ -24,3 +24,14 @@ logging:
   level:
     root: INFO
     io.github.gbessonov: INFO
+
+resilience4j:
+  ratelimiter:
+    configs:
+      instances:
+        registerHealthIndicator: true
+      default:
+        limit-for-period: 10
+        limit-refresh-period: 1s
+        timeout-duration: 0s
+        register-health-indicator: true
