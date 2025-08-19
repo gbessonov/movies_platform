@@ -26,11 +26,6 @@
             <version>2.2.22</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        </dependency>
-
         <!-- Jakarta Servlet API (replaces javax.servlet for Spring Boot 3) -->
         <dependency>
             <groupId>jakarta.servlet</groupId>

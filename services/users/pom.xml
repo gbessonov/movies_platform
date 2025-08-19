@@ -64,12 +64,11 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- TODO: add UI
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
-         -->
+
         <!-- DB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
