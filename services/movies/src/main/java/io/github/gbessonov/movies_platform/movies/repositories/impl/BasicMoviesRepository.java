@@ -2,6 +2,9 @@ package io.github.gbessonov.movies_platform.movies.repositories.impl;
 
 import io.github.gbessonov.movies_platform.movies.entities.DbMovie;
 import io.github.gbessonov.movies_platform.movies.repositories.MoviesRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,6 +16,9 @@ import java.util.UUID;
 
 @Repository
 public class BasicMoviesRepository implements MoviesRepository {
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private final JpaMoviesRepository db;
 
     @Autowired
@@ -23,6 +29,19 @@ public class BasicMoviesRepository implements MoviesRepository {
     @Override
     public List<DbMovie> get() {
         return db.findAll();
+    }
+
+    @Override
+    public List<DbMovie> getTop(Integer topN) {
+        String jpql = """
+                SELECT m FROM DbMovie m
+                ORDER BY m.numberOfLikes DESC, m.id ASC
+                """;
+
+        TypedQuery<DbMovie> query = entityManager.createQuery(jpql, DbMovie.class);
+        query.setMaxResults(topN);
+
+        return query.getResultList();
     }
 
     @Override

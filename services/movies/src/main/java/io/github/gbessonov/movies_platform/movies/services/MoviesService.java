@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface MoviesService {
     List<Movie> getMovies();
+    List<Movie> getTopMovies(int topN);
     Optional<Movie> getMovieById(String id);
     Movie createMovie(CreateMovie movie);
     Movie updateMovie(String id, UpdateMovie movie);

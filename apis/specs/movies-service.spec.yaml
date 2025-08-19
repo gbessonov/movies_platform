@@ -23,7 +23,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movies'
+                $ref: '#/components/schemas/MoviesResponse'
     post:
       tags:
         - Movies
@@ -48,6 +48,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
   /api/movies/{id}:
     get:
       tags:
@@ -146,6 +147,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/movies/top/{number}:
+    get:
+      tags:
+        - Movies
+      summary: List top movies
+      operationId: getTopMovies
+      parameters:
+        - name: number
+          in: path
+          required: true
+          description: Number of top movies to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            example: 10
+          example: "e7f9bf39-286d-4c5b-8ef4-c0e7a5a8232f"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoviesResponse'
+
+
   /api/movies/{id}/like:
     post:
       tags:
@@ -203,6 +231,11 @@ paths:
 
 components:
   schemas:
+    MoviesResponse:
+      oneOf:
+        - $ref: '#/components/schemas/Movies'
+        - $ref: '#/components/schemas/ErrorResponse'
+
     MovieResponse:
       oneOf:
         - $ref: '#/components/schemas/Movie'

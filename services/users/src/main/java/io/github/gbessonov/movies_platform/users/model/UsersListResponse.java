@@ -1,7 +1,4 @@
-package io.github.gbessonov.movies_platform.users.controllers;
-
-import io.github.gbessonov.movies_platform.users.model.User;
-import io.github.gbessonov.movies_platform.users.model.UsersResponse;
+package io.github.gbessonov.movies_platform.users.model;
 
 import java.util.ArrayList;
 import java.util.List;

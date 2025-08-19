@@ -33,6 +33,13 @@ public class BasicMoviesService implements MoviesService {
     }
 
     @Override
+    public List<Movie> getTopMovies(int topN) {
+        return moviesRepository.getTop(topN).stream()
+                .map(BasicMoviesService::mapToMovie)
+                .toList();
+    }
+
+    @Override
     public Optional<Movie> getMovieById(String id) {
         if (id == null || id.isBlank()) {
             return Optional.empty();

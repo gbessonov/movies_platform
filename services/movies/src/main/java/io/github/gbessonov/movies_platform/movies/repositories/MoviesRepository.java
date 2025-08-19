@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface MoviesRepository {
     List<DbMovie> get();
+    List<DbMovie> getTop(Integer topN);
     Optional<DbMovie> get(UUID id);
     DbMovie save(DbMovie movie);
     void deleteById(UUID id);

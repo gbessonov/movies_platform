@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -47,11 +46,20 @@ public class MoviesController implements MoviesApi {
 
     @Override
     @RateLimiter(name = "moviesRateLimiter", fallbackMethod = "fallbackGetMovies")
-    public ResponseEntity<List<Movie>> getMovies() {
+    public ResponseEntity<MoviesResponse> getMovies() {
         //TODO: decide what to do with trailing slashes
         logger.atInfo().log("Received request to get all movies");
-        List<Movie> movies = moviesService.getMovies();
-        return new ResponseEntity<>(movies, HttpStatus.OK);
+        MoviesListResponse resp = MoviesListResponse.fromList(moviesService.getMovies());
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    @Override
+    @RateLimiter(name = "moviesRateLimiter", fallbackMethod = "fallbackGetTopMovies")
+    public ResponseEntity<MoviesResponse> getTopMovies(Integer number) {
+        //TODO: decide what to do with trailing slashes
+        logger.atInfo().log("Received request to get top {} movies", number);
+        MoviesListResponse resp = MoviesListResponse.fromList(moviesService.getTopMovies(number));
+        return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
     @Override
@@ -113,9 +121,9 @@ public class MoviesController implements MoviesApi {
         return createRateLimitErrorResponse();
     }
 
-    public ResponseEntity<List<Movie>> fallbackGetMovies(Throwable t) {
+    public ResponseEntity<MoviesResponse> fallbackGetMovies(Throwable t) {
         ErrorResponse errorResponse = createErrorResponse();
-        return new ResponseEntity(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
+        return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
     }
 
     public ResponseEntity<MovieResponse> fallbackCreateMovie(CreateMovie createMovie, Throwable t) {
@@ -133,7 +141,7 @@ public class MoviesController implements MoviesApi {
 
     private ResponseEntity<MovieResponse> createRateLimitErrorResponse() {
         ErrorResponse errorResponse = createErrorResponse();
-        return new ResponseEntity(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
+        return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
     }
 
     private ErrorResponse createErrorResponse() {
