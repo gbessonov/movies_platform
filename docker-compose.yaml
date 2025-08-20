@@ -1,0 +1,89 @@
+version: "3.9"
+
+networks:
+  moviesnet:
+
+volumes:
+  movies_db_data:
+  users_db_data:
+
+services:
+  # --- Databases ---
+  movies-db:
+    image: postgres:16
+    container_name: ${MOVIES_DB_HOST}
+    environment:
+      POSTGRES_DB: ${MOVIES_DB_NAME}
+      POSTGRES_USER: ${MOVIES_DB_USER}
+      POSTGRES_PASSWORD: ${MOVIES_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - movies_db_data:/var/lib/postgresql/data
+    networks: [moviesnet]
+
+  users-db:
+    image: postgres:16
+    container_name: users_db
+    environment:
+      POSTGRES_DB: ${USERS_DB_NAME}
+      POSTGRES_USER: ${USERS_DB_USER}
+      POSTGRES_PASSWORD: ${USERS_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+    ports:
+      - "5431:5432"
+    volumes:
+      - users_db_data:/var/lib/postgresql/data
+    networks: [moviesnet]
+
+  # --- Microservices ---
+  movies-service:
+    build:
+      context: ./services/movies
+      dockerfile: Dockerfile
+    container_name: movies_service
+    depends_on:
+      movies-db:
+        condition: service_healthy
+    environment:
+      MOVIES_SERVICE_PORT: ${MOVIES_SERVICE_PORT}
+      MOVIES_DB_URL: ${MOVIES_DB_URL}
+      MOVIES_DB_USER: ${MOVIES_DB_USER}
+      MOVIES_DB_PASSWORD: ${MOVIES_DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_KEY: ${JWT_KEY}
+    ports:
+      - "8765:${MOVIES_SERVICE_PORT}"   # host:container
+    networks: [moviesnet]
+
+  users-service:
+    build:
+      context: ./services/users
+      dockerfile: Dockerfile
+    container_name: users_service
+    depends_on:
+      users-db:
+        condition: service_healthy
+    environment:
+      USERS_SERVICE_PORT: ${USERS_SERVICE_PORT}
+      USERS_DB_URL: ${USERS_DB_URL}
+      USERS_DB_USER: ${USERS_DB_USER}
+      USERS_DB_PASSWORD: ${USERS_DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_KEY: ${JWT_KEY}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+      JWT_EXPIRATION_SECONDS: ${JWT_EXPIRATION_SECONDS}
+
+    ports:
+      - "8764:${USERS_SERVICE_PORT}"  # host:container
+    networks: [moviesnet]
