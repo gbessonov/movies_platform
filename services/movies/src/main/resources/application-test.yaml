@@ -4,6 +4,22 @@ spring:
     activate:
       on-profile: test
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      access: unrestricted
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+      tags:
+        application: movies-service
+        environment: docker
+
 otel:
   propagators:
     - tracecontext

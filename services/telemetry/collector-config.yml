@@ -8,29 +8,48 @@ receivers:
 
 processors:
   batch:
+    timeout: 1s
+    send_batch_size: 1024
+    send_batch_max_size: 2048
+
+  # Add resource processor to enrich data
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: "docker"
+        action: upsert
 
 exporters:
-  # Debug exporter to see data in collector logs
+  # Debug exporter for troubleshooting
   debug:
-    verbosity: detailed
+    verbosity: basic
+
+  # OTLP exporter for traces to Jaeger
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
 
   # Prometheus exporter for metrics
   prometheus:
     endpoint: "0.0.0.0:8889"
+    namespace: movies_platform
+    const_labels:
+      environment: docker
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [debug]
+      processors: [resource, batch]
+      exporters: [otlp/jaeger, debug]
 
     metrics:
       receivers: [otlp]
-      processors: [batch]
+      processors: [resource, batch]
       exporters: [prometheus, debug]
 
     logs:
       receivers: [otlp]
-      processors: [batch]
+      processors: [resource, batch]
       exporters: [debug]
