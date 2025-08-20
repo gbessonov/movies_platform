@@ -1,20 +1,7 @@
 spring:
   config:
+    import: optional:file:../../.env[.properties]
     activate:
       on-profile: dev
-  datasource:
-    url: jdbc:postgresql://localhost:5431/users
-    username: users_user
-    password: idkfa
-    driver-class-name: org.postgresql.Driver
   flyway:
-    url: jdbc:postgresql://localhost:5431/users
-    user: users_user
-    password: idkfa
     locations: classpath:db/migration,classpath:db/migration/dev
-jwt:
-  key: 5b4e11d4-b718-4477-a61d-b3e7e83f3fe8
-  issuer: movies_platform
-  audience: movies_platform
-  expiration:
-    seconds: 3600

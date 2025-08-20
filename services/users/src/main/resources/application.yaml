@@ -1,27 +1,53 @@
 spring:
-    application:
-        name: users-service
-    jpa:
-      hibernate:
-        ddl-auto: validate # Flyway will handle schema migrations
-    flyway:
-        enabled: true # Enable Flyway for database migrations
-        locations: classpath:db/migration
+  application:
+    name: users-service
+  jpa:
+    hibernate:
+      ddl-auto: validate # Flyway will handle schema migrations
+  datasource:
+    url: ${USERS_DB_URL}
+    username: ${USERS_DB_USER}
+    password: ${USERS_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true # Enable Flyway for database migrations
+    url: ${USERS_DB_URL}
+    user: ${USERS_DB_USER}
+    password: ${USERS_DB_PASSWORD}
+    locations: classpath:db/migration
 
 management:
-    endpoints:
-        web:
-            exposure:
-                include: health,info,prometheus
-    endpoint:
-        health:
-            probes:
-              enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 server:
-  port: 8764
+  port: ${USERS_SERVICE_PORT}
 
 logging:
   level:
     root: INFO
     io.github.gbessonov: INFO
-    org.springframework.security: INFO
+
+resilience4j:
+  ratelimiter:
+    configs:
+      instances:
+        registerHealthIndicator: true
+      default:
+        limit-for-period: 10
+        limit-refresh-period: 1s
+        timeout-duration: 0s
+        register-health-indicator: true
+
+jwt:
+  key: ${JWT_KEY}
+  issuer: ${JWT_ISSUER}
+  audience: ${JWT_AUDIENCE}
+  expiration:
+    seconds: ${JWT_EXPIRATION_SECONDS}
