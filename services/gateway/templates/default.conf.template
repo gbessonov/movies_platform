@@ -1,0 +1,66 @@
+# Common proxy bits
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  ''      close;
+}
+
+upstream movies_upstream {
+  server movies-service:${MOVIES_SERVICE_PORT};
+}
+
+upstream users_upstream {
+  server users-service:${USERS_SERVICE_PORT};
+}
+
+server {
+  listen 80;
+  server_name _;
+
+  # Internal rewrite to remove trailing slashes (no redirect visible to client)
+  rewrite ^(.+)/$ $1 last;
+
+  # Health endpoint for container healthcheck
+  location = /healthz {
+    return 200 'ok';
+    add_header Content-Type text/plain;
+  }
+
+  # Movies API -> movies-service
+  location /api/movies {
+    proxy_pass         http://movies_upstream/api/movies;
+    proxy_set_header   Host $host;
+    proxy_set_header   X-Real-IP $remote_addr;
+    proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_http_version 1.1;
+    proxy_set_header   Upgrade $http_upgrade;
+    proxy_set_header   Connection $connection_upgrade;
+    proxy_set_header   Authorization $http_authorization;
+  }
+
+  # Auth API -> users-service
+  location /api/auth {
+    proxy_pass         http://users_upstream/api/auth;
+    proxy_set_header   Host $host;
+    proxy_set_header   X-Real-IP $remote_addr;
+    proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_http_version 1.1;
+    proxy_set_header   Upgrade $http_upgrade;
+    proxy_set_header   Connection $connection_upgrade;
+    proxy_set_header   Authorization $http_authorization;
+  }
+
+  # Users API -> users-service
+  location /api/users {
+    proxy_pass         http://users_upstream/api/usersg;
+    proxy_set_header   Host $host;
+    proxy_set_header   X-Real-IP $remote_addr;
+    proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_http_version 1.1;
+    proxy_set_header   Upgrade $http_upgrade;
+    proxy_set_header   Connection $connection_upgrade;
+    proxy_set_header   Authorization $http_authorization;
+  }
+}

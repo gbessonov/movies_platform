@@ -47,7 +47,6 @@ public class MoviesController implements MoviesApi {
     @Override
     @RateLimiter(name = "moviesRateLimiter", fallbackMethod = "fallbackGetMovies")
     public ResponseEntity<MoviesResponse> getMovies() {
-        //TODO: decide what to do with trailing slashes
         logger.atInfo().log("Received request to get all movies");
         MoviesListResponse resp = MoviesListResponse.fromList(moviesService.getMovies());
         return new ResponseEntity<>(resp, HttpStatus.OK);
@@ -56,7 +55,6 @@ public class MoviesController implements MoviesApi {
     @Override
     @RateLimiter(name = "moviesRateLimiter", fallbackMethod = "fallbackGetTopMovies")
     public ResponseEntity<MoviesResponse> getTopMovies(Integer number) {
-        //TODO: decide what to do with trailing slashes
         logger.atInfo().log("Received request to get top {} movies", number);
         MoviesListResponse resp = MoviesListResponse.fromList(moviesService.getTopMovies(number));
         return new ResponseEntity<>(resp, HttpStatus.OK);
@@ -122,6 +120,11 @@ public class MoviesController implements MoviesApi {
     }
 
     public ResponseEntity<MoviesResponse> fallbackGetMovies(Throwable t) {
+        ErrorResponse errorResponse = createErrorResponse();
+        return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    public ResponseEntity<MoviesResponse> fallbackGetTopMovies(Integer number, Throwable t) {
         ErrorResponse errorResponse = createErrorResponse();
         return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
     }

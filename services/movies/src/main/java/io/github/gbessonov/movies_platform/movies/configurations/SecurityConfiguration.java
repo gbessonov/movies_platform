@@ -28,6 +28,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/actuator/**").permitAll() //TODO: decide if we want to secure actuator endpoints
                         .requestMatchers("/api/swagger-ui.html").permitAll() //TODO: Decide if we want to secure Swagger UI
                         .requestMatchers("/api/v3/api-docs/**").permitAll() //TODO: Decide if we want to secure OpenAPI docs
+                        .requestMatchers(HttpMethod.GET, "/api/movies").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/movies/**").hasAnyAuthority("SCOPE_movies:write", "ROLE_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasAnyAuthority("SCOPE_movies:write", "ROLE_ADMIN")

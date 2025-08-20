@@ -1,13 +1,97 @@
-version: "3.9"
+name: movies-platform
 
 networks:
-  moviesnet:
+  edge:           # public-facing network (only nginx attaches here)
+    name: movies_edge
+    driver: bridge
+  internal:       # private network for svc-to-svc and DB
+    name: movies_internal
+    driver: bridge
+    internal: true
 
 volumes:
   movies_db_data:
   users_db_data:
 
 services:
+  # --- Gateway ---
+  gateway:
+    image: ${GATEWAY_NGINX_IMAGE}
+    container_name: gateway
+    environment:
+      USERS_SERVICE_PORT: ${USERS_SERVICE_PORT}
+      MOVIES_SERVICE_PORT: ${MOVIES_SERVICE_PORT}
+    depends_on:
+      movies-service:
+        condition: service_started
+      users-service:
+        condition: service_started
+    ports:
+      - "${GATEWAY_SERVICE_PORT}:80"            # only exposed port
+    volumes:
+      - ./services/gateway/templates/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./services/gateway/__docker-entrypoint.sh:/__docker-entrypoint.sh:ro
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost/healthz" ]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      - edge
+      - internal
+
+  # --- Microservices ---
+  movies-service:
+    build:
+      context: ./services/movies
+      dockerfile: Dockerfile
+    container_name: movies_service
+    depends_on:
+      movies-db:
+        condition: service_healthy
+    #TODO: healthcheck:
+    environment:
+      SERVER_PORT: ${MOVIES_SERVICE_PORT}
+      MOVIES_SERVICE_PORT: ${MOVIES_SERVICE_PORT}
+      MOVIES_DB_URL: ${MOVIES_DB_URL}
+      MOVIES_DB_USER: ${MOVIES_DB_USER}
+      MOVIES_DB_PASSWORD: ${MOVIES_DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_KEY: ${JWT_KEY}
+    expose:
+      - "${MOVIES_SERVICE_PORT}" # reachable only inside 'internal' and by gateway
+    networks:
+      internal:
+        aliases:
+          - movies-service
+
+  users-service:
+    build:
+      context: ./services/users
+      dockerfile: Dockerfile
+    container_name: users_service
+    depends_on:
+      users-db:
+        condition: service_healthy
+    #TODO: healthcheck:
+    environment:
+      SERVER_PORT: ${USERS_SERVICE_PORT}
+      USERS_SERVICE_PORT: ${USERS_SERVICE_PORT}
+      USERS_DB_URL: ${USERS_DB_URL}
+      USERS_DB_USER: ${USERS_DB_USER}
+      USERS_DB_PASSWORD: ${USERS_DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_KEY: ${JWT_KEY}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+      JWT_EXPIRATION_SECONDS: ${JWT_EXPIRATION_SECONDS}
+    expose:
+      - "${USERS_SERVICE_PORT}" # reachable only inside 'internal' and by gateway
+    networks:
+      internal:
+        aliases:
+          - users-service
+
   # --- Databases ---
   movies-db:
     image: postgres:16
@@ -21,11 +105,10 @@ services:
       interval: 5s
       timeout: 2s
       retries: 10
-    ports:
-      - "5432:5432"
     volumes:
       - movies_db_data:/var/lib/postgresql/data
-    networks: [moviesnet]
+    networks:
+      - internal
 
   users-db:
     image: postgres:16
@@ -39,51 +122,7 @@ services:
       interval: 5s
       timeout: 2s
       retries: 10
-    ports:
-      - "5431:5432"
     volumes:
       - users_db_data:/var/lib/postgresql/data
-    networks: [moviesnet]
-
-  # --- Microservices ---
-  movies-service:
-    build:
-      context: ./services/movies
-      dockerfile: Dockerfile
-    container_name: movies_service
-    depends_on:
-      movies-db:
-        condition: service_healthy
-    environment:
-      MOVIES_SERVICE_PORT: ${MOVIES_SERVICE_PORT}
-      MOVIES_DB_URL: ${MOVIES_DB_URL}
-      MOVIES_DB_USER: ${MOVIES_DB_USER}
-      MOVIES_DB_PASSWORD: ${MOVIES_DB_PASSWORD}
-      SPRING_PROFILES_ACTIVE: docker
-      JWT_KEY: ${JWT_KEY}
-    ports:
-      - "8765:${MOVIES_SERVICE_PORT}"   # host:container
-    networks: [moviesnet]
-
-  users-service:
-    build:
-      context: ./services/users
-      dockerfile: Dockerfile
-    container_name: users_service
-    depends_on:
-      users-db:
-        condition: service_healthy
-    environment:
-      USERS_SERVICE_PORT: ${USERS_SERVICE_PORT}
-      USERS_DB_URL: ${USERS_DB_URL}
-      USERS_DB_USER: ${USERS_DB_USER}
-      USERS_DB_PASSWORD: ${USERS_DB_PASSWORD}
-      SPRING_PROFILES_ACTIVE: docker
-      JWT_KEY: ${JWT_KEY}
-      JWT_ISSUER: ${JWT_ISSUER}
-      JWT_AUDIENCE: ${JWT_AUDIENCE}
-      JWT_EXPIRATION_SECONDS: ${JWT_EXPIRATION_SECONDS}
-
-    ports:
-      - "8764:${USERS_SERVICE_PORT}"  # host:container
-    networks: [moviesnet]
+    networks:
+      - internal
