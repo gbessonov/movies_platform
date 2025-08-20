@@ -11,5 +11,7 @@ RUN mvn -q -DskipTests movies-service:package
 # ---- Run stage ----
 FROM eclipse-temurin:21-jre
 WORKDIR /app
+# Download OpenTelemetry agent
+ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar /app/otel-agent.jar
 COPY target/*.jar app.jar
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["java", "-javaagent:/app/otel-agent.jar","-jar","/app/app.jar"]

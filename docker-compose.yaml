@@ -58,6 +58,13 @@ services:
       MOVIES_DB_PASSWORD: ${MOVIES_DB_PASSWORD}
       SPRING_PROFILES_ACTIVE: docker
       JWT_KEY: ${JWT_KEY}
+      OTEL_SERVICE_NAME: "movies-service"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=movies-service,service.version=1.0.0"
+      OTEL_METRICS_EXPORTER: "otlp"
+      OTEL_LOGS_EXPORTER: "otlp"
+      OTEL_TRACES_EXPORTER: "otlp"
     expose:
       - "${MOVIES_SERVICE_PORT}" # reachable only inside 'internal' and by gateway
     networks:
@@ -85,6 +92,13 @@ services:
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
       JWT_EXPIRATION_SECONDS: ${JWT_EXPIRATION_SECONDS}
+      OTEL_SERVICE_NAME: "users-service"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=users-service,service.version=1.0.0"
+      OTEL_METRICS_EXPORTER: "otlp"
+      OTEL_LOGS_EXPORTER: "otlp"
+      OTEL_TRACES_EXPORTER: "otlp"
     expose:
       - "${USERS_SERVICE_PORT}" # reachable only inside 'internal' and by gateway
     networks:
@@ -126,3 +140,18 @@ services:
       - users_db_data:/var/lib/postgresql/data
     networks:
       - internal
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./services/telemetry/collector-config.yml:/etc/otel-collector-config.yml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8888:8888"   # Prometheus metrics
+      - "8889:8889"   # Prometheus exporter metrics
+    networks:
+      - internal
+      - edge

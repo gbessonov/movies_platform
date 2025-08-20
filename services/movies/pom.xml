@@ -116,6 +116,12 @@
             <artifactId>resilience4j-ratelimiter</artifactId>
         </dependency>
 
+        <!-- Telemetry (OTel) -->
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-spring-boot-starter</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

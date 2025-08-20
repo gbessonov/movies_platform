@@ -25,6 +25,7 @@
         <jjwt.version>0.12.6</jjwt.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
         <resilience4j.version>2.1.0</resilience4j.version>
+        <otel.version>2.19.0</otel.version>
     </properties>
 
 
@@ -34,6 +35,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Telemetry (OTel) -->
+
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-instrumentation-bom</artifactId>
+                <version>${otel.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
